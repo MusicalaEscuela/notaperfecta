@@ -1,0 +1,978 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nota Perfecta</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:ital,wght@0,300;0,400;0,500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #070714;
+  --surface: #0d0d22;
+  --border: #1a1a3a;
+  --cyan: #00e8ff;
+  --cyan-glow: rgba(0,232,255,0.10);
+  --amber: #ffbe00;
+  --amber-glow: rgba(255,190,0,0.12);
+  --green: #00f0a0;
+  --red: #ff3a68;
+  --text: #dde0f0;
+  --muted: #44486a;
+  --FD: 'Bebas Neue', cursive;
+  --FM: 'DM Mono', monospace;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--FM);
+  min-height: 100svh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+/* ── Background ── */
+.bg-grid {
+  position: fixed; inset: 0;
+  background-image:
+    linear-gradient(rgba(26,26,58,0.55) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(26,26,58,0.55) 1px, transparent 1px);
+  background-size: 44px 44px;
+  animation: g-drift 28s linear infinite;
+  pointer-events: none;
+}
+@keyframes g-drift {
+  0%   { background-position: 0 0; }
+  100% { background-position: 44px 44px; }
+}
+.bg-glow {
+  position: fixed;
+  width: 640px; height: 640px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(0,232,255,0.05) 0%, transparent 65%);
+  top:50%; left:50%; transform:translate(-50%,-50%);
+  pointer-events: none;
+}
+
+/* ── Overlays ── */
+.overlay {
+  position: fixed; inset: 0; z-index: 200;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 18px; padding: 32px; text-align: center;
+  background: rgba(7,7,20,0.96);
+  backdrop-filter: blur(10px);
+  animation: ov-in 0.35s ease both;
+}
+.overlay.hidden { display: none; }
+@keyframes ov-in {
+  from { opacity:0; transform:scale(0.96); }
+  to   { opacity:1; transform:scale(1); }
+}
+.ov-eye {
+  font-size: 10px; letter-spacing: 0.3em;
+  text-transform: uppercase; color: var(--muted);
+}
+.ov-title {
+  font-family: var(--FD);
+  font-size: clamp(54px, 15vw, 76px);
+  line-height: 0.9; letter-spacing: 0.05em;
+}
+.ov-title.cyan { color:var(--cyan); text-shadow:0 0 60px rgba(0,232,255,0.45); }
+.ov-title.red  { color:var(--red);  text-shadow:0 0 60px rgba(255,58,104,0.45); }
+.ov-title.amb  { color:var(--amber);text-shadow:0 0 60px rgba(255,190,0,0.45); }
+.ov-body {
+  font-size: 12.5px; color: var(--muted);
+  line-height: 1.85; max-width: 280px; letter-spacing: 0.03em;
+}
+.ov-stat {
+  font-family: var(--FD); font-size: 34px; color: var(--amber);
+}
+
+/* ── Buttons ── */
+.btn {
+  font-family: var(--FM); font-size: 11.5px;
+  letter-spacing: 0.12em; text-transform: uppercase;
+  border-radius: 9px; padding: 11px 28px; cursor: pointer;
+  transition: all 0.14s; background: transparent;
+  color: var(--text); border: 1px solid var(--border);
+}
+.btn:hover {
+  border-color: var(--cyan); color: var(--cyan);
+  box-shadow: 0 0 22px var(--cyan-glow), inset 0 0 16px var(--cyan-glow);
+}
+.btn:active { transform: scale(0.97); }
+.btn-p {
+  background: var(--cyan-glow); border-color: var(--cyan);
+  color: var(--cyan); box-shadow: 0 0 24px var(--cyan-glow);
+}
+.btn-p:hover {
+  background: rgba(0,232,255,0.18);
+  box-shadow: 0 0 34px rgba(0,232,255,0.2);
+}
+.btn:disabled { opacity: 0.22; pointer-events: none; }
+
+/* ── Game container ── */
+.game {
+  position: relative; z-index: 10;
+  width: 100%; max-width: 450px;
+  padding: 18px 16px;
+  display: flex; flex-direction: column; gap: 14px;
+}
+.game.hidden { display: none; }
+
+/* Header */
+.hdr {
+  display: flex; justify-content: space-between; align-items: center;
+}
+.hdr-title {
+  font-family: var(--FD); font-size: 22px; color: var(--cyan);
+  letter-spacing: 0.12em; text-shadow: 0 0 14px rgba(0,232,255,0.35);
+}
+.hdr-right {
+  display: flex; align-items: center; gap: 14px;
+}
+.lives { display: flex; gap: 6px; align-items: center; }
+.ld {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: var(--red); box-shadow: 0 0 6px var(--red);
+  transition: all 0.3s;
+}
+.ld.gone { background: var(--border); box-shadow: none; }
+.lvl-b { text-align: right; }
+.lvl-n {
+  font-family: var(--FD); font-size: 26px; color: var(--amber);
+  line-height: 1; text-shadow: 0 0 10px rgba(255,190,0,0.35);
+}
+.lvl-l {
+  font-size: 8.5px; letter-spacing: 0.2em;
+  text-transform: uppercase; color: var(--muted);
+}
+
+/* Score strip */
+.score-strip {
+  display: flex; justify-content: space-between; align-items: center;
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 10px; padding: 9px 16px;
+}
+.ss-v { font-family: var(--FD); font-size: 26px; color: var(--text); }
+.ss-l {
+  font-size: 8.5px; letter-spacing: 0.2em;
+  text-transform: uppercase; color: var(--muted);
+  margin-bottom: 1px;
+}
+
+/* Sequence chips */
+.sequence {
+  display: flex; gap: 9px;
+  justify-content: center; flex-wrap: wrap;
+  min-height: 50px; align-items: center;
+}
+.chip {
+  width: 50px; height: 50px; border-radius: 11px;
+  border: 1px solid var(--border);
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  font-size: 13px; font-weight: 500; color: var(--muted);
+  background: var(--surface);
+  transition: all 0.28s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.chip small {
+  font-size: 7.5px; letter-spacing: 0.08em;
+  text-transform: uppercase; opacity: 0.45; margin-top: 2px;
+}
+.chip.active {
+  border-color: var(--cyan); color: var(--cyan);
+  background: var(--cyan-glow);
+  box-shadow: 0 0 0 3px rgba(0,232,255,0.08), 0 0 18px rgba(0,232,255,0.1);
+  transform: translateY(-3px) scale(1.07);
+}
+.chip.done {
+  border-color: var(--green); color: var(--green);
+  background: rgba(0,240,160,0.07);
+}
+.chip.playing {
+  border-color: var(--amber); color: var(--amber);
+  background: var(--amber-glow);
+  animation: chip-pop 0.38s ease;
+}
+@keyframes chip-pop {
+  0%  { transform: scale(1); }
+  45% { transform: scale(1.16) translateY(-4px); }
+  100%{ transform: scale(1); }
+}
+
+/* Note card */
+.note-card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 16px; padding: 22px 18px;
+  text-align: center; position: relative; overflow: hidden;
+  transition: border-color 0.25s, box-shadow 0.25s;
+}
+.note-card::after {
+  content: '';
+  position: absolute; top:0; left:0; right:0; height:1px;
+  background: linear-gradient(90deg, transparent, var(--cyan), transparent);
+  opacity: 0.35;
+}
+.note-card.on  { border-color: var(--green); box-shadow: 0 0 28px rgba(0,240,160,0.09); }
+.note-card.close{ border-color: var(--amber); }
+.note-card.off { border-color: var(--red); }
+
+.nc-lbl {
+  font-size: 9.5px; letter-spacing: 0.25em;
+  text-transform: uppercase; color: var(--muted); margin-bottom: 5px;
+}
+.nc-big {
+  font-family: var(--FD);
+  font-size: clamp(68px, 20vw, 92px);
+  line-height: 0.88; letter-spacing: 0.04em;
+  color: var(--cyan); text-shadow: 0 0 38px rgba(0,232,255,0.38);
+  transition: all 0.18s;
+}
+.nc-big.on   { color: var(--green); text-shadow: 0 0 38px rgba(0,240,160,0.45); }
+.nc-big.fail { color: var(--red);   text-shadow: 0 0 28px rgba(255,58,104,0.4); }
+.nc-hz {
+  font-size: 11px; color: var(--muted);
+  margin-top: 5px; font-style: italic; font-weight: 300;
+}
+
+/* Pitch meter */
+.meter-wrap { display: flex; flex-direction: column; gap: 7px; }
+.m-lbl-row {
+  display: flex; justify-content: space-between;
+  font-size: 8.5px; letter-spacing: 0.1em;
+  text-transform: uppercase; color: var(--muted);
+}
+.m-bar {
+  position: relative; height: 13px; border-radius: 7px;
+  overflow: hidden; background: var(--surface);
+  border: 1px solid var(--border);
+}
+.m-zones {
+  position: absolute; inset: 0;
+  background: linear-gradient(90deg,
+    rgba(255,58,104,0.22) 0%,
+    rgba(255,190,0,0.18)  22%,
+    rgba(0,240,160,0.28)  40%,
+    rgba(0,240,160,0.28)  60%,
+    rgba(255,190,0,0.18)  78%,
+    rgba(255,58,104,0.22) 100%
+  );
+}
+.m-tick {
+  position: absolute; top:0; bottom:0; left:50%;
+  width: 2px; margin-left:-1px;
+  background: rgba(0,232,255,0.45);
+}
+.m-dot {
+  position: absolute; top:50%; left:50%;
+  width: 19px; height: 19px;
+  margin-top: -9px; margin-left: -9px;
+  border-radius: 50%; background: var(--muted);
+  border: 2px solid var(--bg);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.6);
+  transition: left 0.07s linear, background 0.14s, box-shadow 0.14s;
+}
+.m-dot.on    { background:var(--green); box-shadow:0 0 12px var(--green), 0 2px 8px rgba(0,0,0,0.5); }
+.m-dot.close { background:var(--amber); box-shadow:0 0 8px var(--amber), 0 2px 8px rgba(0,0,0,0.5); }
+.m-info {
+  display: flex; justify-content: space-between; align-items: center;
+}
+.det-lbl {
+  font-size: 8.5px; letter-spacing: 0.15em;
+  text-transform: uppercase; color: var(--muted);
+}
+.det-val {
+  font-family: var(--FD); font-size: 21px;
+  color: var(--text); letter-spacing: 0.08em;
+}
+.cents-v {
+  font-size: 10px; color: var(--muted);
+  font-style: italic; min-width: 46px; text-align: right;
+}
+
+/* Bars */
+.bars-row { display: flex; flex-direction: column; gap: 9px; }
+.bar-it { display: flex; flex-direction: column; gap: 4px; }
+.bar-lr {
+  display: flex; justify-content: space-between;
+  font-size: 8.5px; letter-spacing: 0.14em;
+  text-transform: uppercase; color: var(--muted);
+}
+.bar-trk {
+  height: 5px; background: var(--surface);
+  border: 1px solid var(--border); border-radius: 3px; overflow: hidden;
+}
+.bar-f { height: 100%; border-radius: 3px; width: 0%; transition: width 0.05s linear; }
+.hf {
+  background: linear-gradient(90deg, var(--cyan), var(--green));
+  box-shadow: 0 0 6px rgba(0,232,255,0.4);
+  transition: width 0.05s linear, background 0.3s;
+}
+.hf.done { background: linear-gradient(90deg, var(--amber), var(--green)); }
+.tf {
+  background: var(--cyan);
+  transition: width 0.1s linear, background 0.25s;
+}
+.tf.warn { background: var(--amber); }
+.tf.crit { background: var(--red); }
+
+/* Status */
+.status {
+  text-align: center; font-size: 11.5px;
+  letter-spacing: 0.07em; color: var(--muted);
+  min-height: 18px; transition: color 0.2s;
+}
+.status.good { color: var(--green); }
+.status.warn { color: var(--amber); }
+.status.bad  { color: var(--red); }
+
+/* Actions */
+.actions { display: flex; gap: 9px; }
+.actions .btn { flex: 1; }
+
+/* Flash */
+.flash {
+  position: fixed; inset: 0; pointer-events: none; z-index: 100;
+  animation: flash-out 0.65s ease forwards;
+}
+@keyframes flash-out {
+  0%  { opacity: 0; }
+  18% { opacity: 1; }
+  100%{ opacity: 0; }
+}
+</style>
+</head>
+<body>
+
+<div class="bg-grid"></div>
+<div class="bg-glow"></div>
+
+<!-- Intro -->
+<div class="overlay" id="oIntro">
+  <div class="ov-eye">Entrenamiento vocal</div>
+  <div class="ov-title cyan">NOTA<br>PERFECTA</div>
+  <div class="ov-body">
+    Escucha la nota y cántala con tu voz.<br>
+    Mantén el tono para avanzar de nivel.<br>
+    Escala Do mayor · Do Re Mi Fa Sol La Si
+  </div>
+  <button class="btn btn-p" id="btnStart">▶ &nbsp;Comenzar</button>
+</div>
+
+<!-- Game Over -->
+<div class="overlay hidden" id="oGameOver">
+  <div class="ov-eye">Fin del juego</div>
+  <div class="ov-title red">GAME<br>OVER</div>
+  <div class="ov-stat" id="goScore">0 pts</div>
+  <div class="ov-body" id="goBody">Nivel 1 · 0 notas acertadas</div>
+  <button class="btn btn-p" id="btnRestart">↺ &nbsp;Reintentar</button>
+</div>
+
+<!-- Level Up (brief) -->
+<div class="overlay hidden" id="oLvlUp">
+  <div class="ov-eye">¡Nivel superado!</div>
+  <div class="ov-title amb">NIVEL<br><span id="luNum">2</span></div>
+  <div class="ov-body" id="luMsg">¡Excelente afinación!</div>
+</div>
+
+<!-- Game UI -->
+<div class="game hidden" id="gameUI">
+
+  <div class="hdr">
+    <div class="hdr-title">NOTA PERFECTA</div>
+    <div class="hdr-right">
+      <div class="lives">
+        <div class="ld" id="ld0"></div>
+        <div class="ld" id="ld1"></div>
+        <div class="ld" id="ld2"></div>
+      </div>
+      <div class="lvl-b">
+        <div class="lvl-n" id="lvlN">1</div>
+        <div class="lvl-l">Nivel</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="score-strip">
+    <div>
+      <div class="ss-l">Puntos</div>
+      <div class="ss-v" id="scoreV">0</div>
+    </div>
+    <div style="text-align:right">
+      <div class="ss-l">Notas acertadas</div>
+      <div class="ss-v" id="hitsV">0</div>
+    </div>
+  </div>
+
+  <div class="sequence" id="seqEl"></div>
+
+  <div class="note-card" id="noteCard">
+    <div class="nc-lbl" id="ncLbl">Cargando...</div>
+    <div class="nc-big" id="ncBig">—</div>
+    <div class="nc-hz" id="ncHz"></div>
+  </div>
+
+  <div class="meter-wrap">
+    <div class="m-lbl-row">
+      <span>♭ Muy bajo</span>
+      <span>Muy alto ♯</span>
+    </div>
+    <div class="m-bar">
+      <div class="m-zones"></div>
+      <div class="m-tick"></div>
+      <div class="m-dot" id="mDot"></div>
+    </div>
+    <div class="m-info">
+      <div>
+        <div class="det-lbl">Detectando</div>
+        <div class="det-val" id="detV">—</div>
+      </div>
+      <div class="cents-v" id="centsV"></div>
+    </div>
+  </div>
+
+  <div class="bars-row">
+    <div class="bar-it">
+      <div class="bar-lr">
+        <span>Mantener nota</span>
+        <span id="hPctLbl">0%</span>
+      </div>
+      <div class="bar-trk"><div class="bar-f hf" id="holdBar"></div></div>
+    </div>
+    <div class="bar-it">
+      <div class="bar-lr">
+        <span>Tiempo restante</span>
+        <span id="timerLbl">—</span>
+      </div>
+      <div class="bar-trk"><div class="bar-f tf" id="timerBar"></div></div>
+    </div>
+  </div>
+
+  <div class="status" id="statusEl">—</div>
+
+  <div class="actions">
+    <button class="btn" id="btnReplay">↻ &nbsp;Escuchar</button>
+  </div>
+
+</div>
+
+<script>
+// ═══════════════════════════════════════════════
+//  CONSTANTS
+// ═══════════════════════════════════════════════
+const NOTES = [
+  { name:'Do',  freq:261.63 },
+  { name:'Re',  freq:293.66 },
+  { name:'Mi',  freq:329.63 },
+  { name:'Fa',  freq:349.23 },
+  { name:'Sol', freq:392.00 },
+  { name:'La',  freq:440.00 },
+  { name:'Si',  freq:493.88 },
+];
+
+const EASY = [0,2,4]; // Do Mi Sol
+const HOLD_MS = 850;
+const TOL_CENTS = 58;
+
+function seqLen(lvl) {
+  if (lvl <= 6)  return 1;
+  if (lvl <= 9)  return 2;
+  if (lvl <= 12) return 3;
+  return 4;
+}
+function timeLimit(lvl) {
+  if (lvl <= 3)  return 11000;
+  if (lvl <= 6)  return 8500;
+  if (lvl <= 9)  return 7000;
+  return 6000;
+}
+function pool(lvl) { return lvl <= 3 ? EASY : [0,1,2,3,4,5,6]; }
+
+// ═══════════════════════════════════════════════
+//  STATE
+// ═══════════════════════════════════════════════
+let audioCtx = null, analyser = null, micStream = null;
+let rafId = null, frameN = 0;
+
+let gLvl = 1, gLives = 3, gScore = 0, gHits = 0;
+let gSeq = [], gIdx = 0, gMiss = 0;
+let gPhase = 'idle'; // idle|demo|listening|win_note|fail_note
+let gHoldStart = null, gTimerStart = null, gTL = 8000;
+
+// ═══════════════════════════════════════════════
+//  AUDIO OUTPUT
+// ═══════════════════════════════════════════════
+function ensureAudio() {
+  if (!audioCtx) audioCtx = new (window.AudioContext||window.webkitAudioContext)();
+  if (audioCtx.state === 'suspended') audioCtx.resume();
+}
+
+function playTone(freq, dur=1.0, vol=0.42) {
+  ensureAudio();
+  const o = audioCtx.createOscillator();
+  const g = audioCtx.createGain();
+  o.type = 'sine'; o.frequency.value = freq;
+  const t = audioCtx.currentTime;
+  g.gain.setValueAtTime(0, t);
+  g.gain.linearRampToValueAtTime(vol, t+0.04);
+  g.gain.setValueAtTime(vol, t+dur-0.1);
+  g.gain.linearRampToValueAtTime(0, t+dur);
+  o.connect(g); g.connect(audioCtx.destination);
+  o.start(t); o.stop(t+dur);
+}
+
+function playOK() {
+  ensureAudio();
+  const t = audioCtx.currentTime;
+  [523.25,659.25,784.00].forEach((f,i) => {
+    const o = audioCtx.createOscillator(), g = audioCtx.createGain();
+    o.type = 'sine'; o.frequency.value = f;
+    g.gain.setValueAtTime(0, t+i*0.1);
+    g.gain.linearRampToValueAtTime(0.18, t+i*0.1+0.03);
+    g.gain.linearRampToValueAtTime(0, t+i*0.1+0.3);
+    o.connect(g); g.connect(audioCtx.destination);
+    o.start(t+i*0.1); o.stop(t+i*0.1+0.35);
+  });
+}
+
+function playFail() {
+  ensureAudio();
+  const t = audioCtx.currentTime;
+  const o = audioCtx.createOscillator(), g = audioCtx.createGain();
+  o.type = 'sawtooth'; o.frequency.value = 160;
+  g.gain.setValueAtTime(0, t);
+  g.gain.linearRampToValueAtTime(0.25, t+0.02);
+  g.gain.linearRampToValueAtTime(0, t+0.38);
+  o.connect(g); g.connect(audioCtx.destination);
+  o.start(t); o.stop(t+0.4);
+}
+
+const wait = ms => new Promise(r => setTimeout(r, ms));
+
+async function playSeqDemo(seq, hilite) {
+  for (let i = 0; i < seq.length; i++) {
+    hilite(i);
+    playTone(NOTES[seq[i]].freq, 0.85);
+    await wait(1300);
+  }
+  hilite(-1);
+}
+
+// ═══════════════════════════════════════════════
+//  PITCH DETECTION
+// ═══════════════════════════════════════════════
+async function startMic() {
+  if (micStream) return;
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({audio:true,video:false});
+    micStream = stream;
+    ensureAudio();
+    const src = audioCtx.createMediaStreamSource(stream);
+    analyser = audioCtx.createAnalyser();
+    analyser.fftSize = 2048;
+    analyser.smoothingTimeConstant = 0;
+    src.connect(analyser);
+  } catch(e) {
+    setSt('⚠ Sin acceso al micrófono', 'bad');
+  }
+}
+
+function autoCorrelate(buf, sr) {
+  const SIZE = buf.length;
+  let rms = 0;
+  for (let i=0; i<SIZE; i++) rms += buf[i]*buf[i];
+  rms = Math.sqrt(rms/SIZE);
+  if (rms < 0.011) return -1;
+
+  // Range: 80–1300 Hz
+  const minP = Math.floor(sr/1300);
+  const maxP = Math.min(Math.floor(sr/80), Math.floor(SIZE/2));
+
+  let best = -Infinity, bestL = -1;
+
+  // Coarse pass (step 2)
+  for (let lag = minP; lag <= maxP; lag += 2) {
+    let s = 0;
+    const n = SIZE - lag;
+    for (let j=0; j<n; j++) s += buf[j]*buf[j+lag];
+    if (s > best) { best=s; bestL=lag; }
+  }
+  if (bestL < 0) return -1;
+
+  // Refine ±3
+  let rBest = best, rL = bestL;
+  for (let lag = Math.max(minP, bestL-3); lag <= Math.min(maxP, bestL+3); lag++) {
+    let s = 0;
+    const n = SIZE - lag;
+    for (let j=0; j<n; j++) s += buf[j]*buf[j+lag];
+    if (s > rBest) { rBest=s; rL=lag; }
+  }
+
+  return sr / rL;
+}
+
+// Cents difference considering octave transpositions (±1 oct)
+function bestCents(freq, targetFreq) {
+  const mults = [0.5, 1, 2];
+  let minAbs = Infinity, minC = 0;
+  for (const m of mults) {
+    const c = 1200 * Math.log2(freq / (targetFreq * m));
+    if (Math.abs(c) < minAbs) { minAbs = Math.abs(c); minC = c; }
+  }
+  return minC;
+}
+
+function freqToSolfege(freq) {
+  if (freq <= 0) return '—';
+  const n = Math.round(12 * Math.log2(freq/440) + 69);
+  const MAP = ['Do','Do#','Re','Re#','Mi','Fa','Fa#','Sol','Sol#','La','La#','Si'];
+  return MAP[((n%12)+12)%12];
+}
+
+// ═══════════════════════════════════════════════
+//  PITCH LOOP
+// ═══════════════════════════════════════════════
+function startPitchLoop() {
+  if (!analyser) return;
+  const buf = new Float32Array(2048);
+  const sr  = audioCtx.sampleRate;
+
+  function loop() {
+    rafId = requestAnimationFrame(loop);
+    frameN++;
+
+    if (gPhase !== 'listening') {
+      dotReset(); return;
+    }
+
+    // Timer: every frame
+    checkTimer();
+
+    // Pitch: every 2 frames (~30fps effective)
+    if (frameN % 2 !== 0) return;
+
+    analyser.getFloatTimeDomainData(buf);
+    const freq = autoCorrelate(buf, sr);
+
+    if (freq <= 0) {
+      gHoldStart = null;
+      setHold(0); dotReset();
+      setDet('—', null);
+      setSt('Canta más fuerte...','');
+      return;
+    }
+
+    const target = NOTES[gSeq[gIdx]];
+    const cents  = bestCents(freq, target.freq);
+    const absC   = Math.abs(cents);
+
+    setDet(freqToSolfege(freq), cents);
+    updateDot(cents);
+
+    if (absC <= TOL_CENTS) {
+      if (!gHoldStart) gHoldStart = performance.now();
+      const elapsed = performance.now() - gHoldStart;
+      const pct = Math.min(elapsed / HOLD_MS, 1);
+      setHold(pct * 100);
+      if (elapsed >= HOLD_MS) {
+        onNoteHeld();
+      } else {
+        setSt('¡Sostenla! 🎵','good');
+        cardState('on');
+      }
+    } else {
+      gHoldStart = null;
+      setHold(0);
+      const dir = cents < 0 ? '↑ Sube la nota' : '↓ Baja la nota';
+      setSt(dir,'warn');
+      cardState(absC < 120 ? 'close' : 'off');
+    }
+  }
+  loop();
+}
+
+function checkTimer() {
+  if (!gTimerStart) return;
+  const rem = Math.max(0, gTL - (performance.now() - gTimerStart));
+  const pct = (rem / gTL) * 100;
+  const bar = id('timerBar');
+  bar.style.width = pct + '%';
+  bar.className = 'bar-f tf' + (pct < 18 ? ' crit' : pct < 38 ? ' warn' : '');
+  id('timerLbl').textContent = (rem/1000).toFixed(1) + 's';
+  if (rem <= 0) onTimerExpired();
+}
+
+// ═══════════════════════════════════════════════
+//  UI HELPERS
+// ═══════════════════════════════════════════════
+const id = s => document.getElementById(s);
+
+function setSt(msg, cls='') {
+  const el = id('statusEl');
+  el.textContent = msg; el.className = 'status ' + cls;
+}
+
+function setDet(name, cents) {
+  id('detV').textContent = name;
+  if (cents !== null && name !== '—') {
+    const c = Math.round(cents);
+    id('centsV').textContent = (c > 0 ? '+' : '') + c + '¢';
+  } else { id('centsV').textContent = ''; }
+}
+
+function setHold(pct) {
+  const b = id('holdBar');
+  b.style.width = pct + '%';
+  b.className = 'bar-f hf' + (pct >= 100 ? ' done' : '');
+  id('hPctLbl').textContent = Math.round(pct) + '%';
+}
+
+function dotReset() {
+  const d = id('mDot'); d.style.left='50%'; d.className='m-dot';
+}
+
+function updateDot(cents) {
+  const d = id('mDot');
+  const cl = Math.max(-170, Math.min(170, cents));
+  d.style.left = (cl/340 + 0.5)*100 + '%';
+  const a = Math.abs(cents);
+  d.className = 'm-dot' + (a <= TOL_CENTS ? ' on' : a <= 110 ? ' close' : '');
+}
+
+function cardState(s) {
+  id('noteCard').className = 'note-card ' + s;
+  id('ncBig').className = 'nc-big' + (s==='on' ? ' on' : s==='off' ? ' fail' : '');
+}
+
+function updateLivesUI() {
+  for (let i=0; i<3; i++)
+    id('ld'+i).className = 'ld' + (i >= gLives ? ' gone' : '');
+}
+
+function renderSeq(activeDemo=-1) {
+  const el = id('seqEl'); el.innerHTML = '';
+  gSeq.forEach((ni, i) => {
+    const c = document.createElement('div');
+    let cls = 'chip';
+    if (i === activeDemo) cls += ' playing';
+    else if (i < gIdx)   cls += ' done';
+    else if (i === gIdx && gPhase === 'listening') cls += ' active';
+    c.className = cls;
+    c.innerHTML = `${NOTES[ni].name}<small>${NOTES[ni].freq}Hz</small>`;
+    el.appendChild(c);
+  });
+}
+
+function showNote() {
+  const n = NOTES[gSeq[gIdx]];
+  id('ncLbl').textContent = 'Nota objetivo';
+  id('ncBig').textContent  = n.name;
+  id('ncBig').className    = 'nc-big';
+  id('ncHz').textContent   = n.freq + ' Hz';
+  id('noteCard').className = 'note-card';
+  renderSeq();
+}
+
+// ═══════════════════════════════════════════════
+//  GAME FLOW
+// ═══════════════════════════════════════════════
+function genSeq(lvl) {
+  const len = seqLen(lvl), p = pool(lvl), result = [];
+  for (let i=0; i<len; i++) result.push(p[Math.floor(Math.random()*p.length)]);
+  return result;
+}
+
+async function startLevel() {
+  gPhase = 'idle'; gIdx = 0; gMiss = 0;
+  gSeq = genSeq(gLvl); gTL = timeLimit(gLvl);
+
+  id('lvlN').textContent = gLvl;
+  id('btnReplay').disabled = true;
+
+  id('ncLbl').textContent = 'Escucha...';
+  id('ncBig').textContent  = '♪';
+  id('ncBig').className    = 'nc-big';
+  id('ncHz').textContent   = '';
+  id('noteCard').className = 'note-card';
+  setHold(0);
+  id('timerBar').style.width = '100%';
+  id('timerBar').className   = 'bar-f tf';
+  id('timerLbl').textContent = '—';
+  setDet('—', null); dotReset();
+  setSt('Escucha la secuencia...','');
+  renderSeq(-1);
+
+  // Demo
+  gPhase = 'demo';
+  await playSeqDemo(gSeq, (i) => {
+    renderSeq(i);
+    if (i >= 0) {
+      id('ncBig').textContent = NOTES[gSeq[i]].name;
+      id('ncLbl').textContent = '♪ Escuchando';
+    }
+  });
+
+  // Listen
+  showNote();
+  gPhase = 'listening';
+  gHoldStart = null;
+  gTimerStart = performance.now();
+  setSt('¡Tu turno! Canta la nota','');
+  id('btnReplay').disabled = false;
+}
+
+async function onNoteHeld() {
+  if (gPhase !== 'listening') return;
+  gPhase = 'win_note';
+  playOK();
+
+  cardState('on');
+  setHold(100);
+
+  gScore += 10 * gLvl; gHits++;
+  id('scoreV').textContent = gScore;
+  id('hitsV').textContent  = gHits;
+  setSt('¡Perfecta! ✓','good');
+
+  // Mark chip done visually
+  const chips = document.querySelectorAll('.chip');
+  if (chips[gIdx]) chips[gIdx].className = 'chip done';
+
+  await wait(550);
+  gIdx++;
+
+  if (gIdx >= gSeq.length) {
+    await doLevelUp();
+  } else {
+    showNote();
+    gPhase = 'listening';
+    gHoldStart = null;
+    gTimerStart = performance.now();
+    setHold(0);
+    setSt('¡Siguiente! ' + NOTES[gSeq[gIdx]].name,'');
+  }
+}
+
+async function onTimerExpired() {
+  if (gPhase !== 'listening') return;
+  gPhase = 'fail_note';
+  playFail();
+  cardState('off');
+  gMiss++;
+
+  if (gMiss >= 3) {
+    gLives--; gMiss = 0;
+    updateLivesUI();
+    setSt(`Vida perdida · ${gLives} restante${gLives!==1?'s':''}`, 'bad');
+    await wait(1300);
+    if (gLives <= 0) { doGameOver(); return; }
+    // Restart whole level
+    await startLevel(); return;
+  }
+
+  setSt(`Tiempo agotado · Intento ${gMiss}/3`, 'bad');
+  await wait(900);
+  showNote();
+  gPhase = 'listening';
+  gHoldStart = null;
+  gTimerStart = performance.now();
+  setHold(0);
+  setSt('¡Inténtalo de nuevo!','warn');
+}
+
+async function doLevelUp() {
+  gLvl++;
+  const flash = document.createElement('div');
+  flash.className = 'flash';
+  flash.style.background = 'radial-gradient(circle, rgba(255,190,0,0.22), transparent 70%)';
+  document.body.appendChild(flash);
+  setTimeout(() => flash.remove(), 700);
+
+  id('oLvlUp').classList.remove('hidden');
+  id('luNum').textContent = gLvl;
+  id('luMsg').textContent = lvlMsg(gLvl);
+  await wait(1900);
+  id('oLvlUp').classList.add('hidden');
+  await startLevel();
+}
+
+function lvlMsg(lvl) {
+  const m = ['','','','','¡Buen trabajo! Ahora con notas mezcladas',
+    '¡Afinando el oído!','¡Excelente! Secuencias de 2 notas',
+    '¡Magistral!','¡Virtuoso!','¡Imparable!','¡Nota perfecta real!'];
+  return m[Math.min(lvl, m.length-1)] || '¡Imbatible!';
+}
+
+function doGameOver() {
+  gPhase = 'idle';
+  id('gameUI').classList.add('hidden');
+  id('goScore').textContent = gScore + ' pts';
+  id('goBody').textContent  = `Nivel ${gLvl} · ${gHits} notas acertadas`;
+  id('oGameOver').classList.remove('hidden');
+}
+
+async function replayNote() {
+  if (gPhase !== 'listening') return;
+  gPhase = 'demo';
+  setSt('Escucha de nuevo...','');
+  id('btnReplay').disabled = true;
+  gHoldStart = null; gTimerStart = null;
+  setHold(0);
+
+  const sub = gSeq.slice(0, gIdx+1);
+  for (let i=0; i<sub.length; i++) {
+    id('ncBig').textContent = NOTES[sub[i]].name;
+    renderSeq(i);
+    playTone(NOTES[sub[i]].freq, 0.85);
+    await wait(1300);
+  }
+  renderSeq();
+  showNote();
+  gPhase = 'listening';
+  gTimerStart = performance.now();
+  id('btnReplay').disabled = false;
+  setSt('¡Ahora tú!','');
+}
+
+// ═══════════════════════════════════════════════
+//  INIT
+// ═══════════════════════════════════════════════
+async function init() {
+  gLvl=1; gLives=3; gScore=0; gHits=0;
+  id('scoreV').textContent = '0';
+  id('hitsV').textContent  = '0';
+  id('oIntro').classList.add('hidden');
+  id('oGameOver').classList.add('hidden');
+  id('gameUI').classList.remove('hidden');
+  updateLivesUI();
+
+  await startMic();
+
+  if (!analyser) {
+    id('ncLbl').textContent = 'Sin micrófono';
+    id('ncBig').textContent  = '🎤';
+    id('ncHz').textContent   = 'Permite el acceso al micrófono y recarga';
+    id('noteCard').className = 'note-card off';
+    setSt('⚠ Se necesita el micrófono para jugar', 'bad');
+    id('btnReplay').textContent = '↻ Reintentar';
+    id('btnReplay').disabled = false;
+    id('btnReplay').onclick = init;
+    return;
+  }
+
+  if (!rafId) startPitchLoop();
+  await startLevel();
+}
+
+id('btnStart').addEventListener('click', init);
+id('btnRestart').addEventListener('click', () => {
+  id('oGameOver').classList.add('hidden'); init();
+});
+id('btnReplay').addEventListener('click', replayNote);
+</script>
+</body>
+</html>

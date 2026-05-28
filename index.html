@@ -3,318 +3,659 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Nota Perfecta</title>
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:ital,wght@0,300;0,400;0,500&display=swap" rel="stylesheet">
+<title>Nota Perfecta · Musicala</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700;800;900&family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
 <style>
 :root {
-  --bg: #070714;
-  --surface: #0d0d22;
-  --border: #1a1a3a;
-  --cyan: #00e8ff;
-  --cyan-glow: rgba(0,232,255,0.10);
-  --amber: #ffbe00;
-  --amber-glow: rgba(255,190,0,0.12);
-  --green: #00f0a0;
-  --red: #ff3a68;
-  --text: #dde0f0;
-  --muted: #44486a;
-  --FD: 'Bebas Neue', cursive;
-  --FM: 'DM Mono', monospace;
+  --bg: #fff8ff;
+  --bg-2: #f4f7ff;
+  --surface: rgba(255, 255, 255, 0.82);
+  --surface-solid: #ffffff;
+  --surface-soft: #fff2fb;
+  --border: rgba(107, 51, 167, 0.14);
+  --border-strong: rgba(107, 51, 167, 0.28);
+  --purple: #7137d8;
+  --purple-2: #9b5cff;
+  --pink: #ff4fb8;
+  --cyan: #00b8d9;
+  --cyan-soft: rgba(0, 184, 217, 0.13);
+  --amber: #ffb703;
+  --amber-soft: rgba(255, 183, 3, 0.16);
+  --green: #14b86a;
+  --green-soft: rgba(20, 184, 106, 0.14);
+  --red: #f0446f;
+  --red-soft: rgba(240, 68, 111, 0.14);
+  --text: #261b3d;
+  --muted: #786f8d;
+  --shadow: 0 24px 70px rgba(81, 44, 130, 0.18);
+  --shadow-soft: 0 12px 36px rgba(81, 44, 130, 0.12);
+  --FF: 'DM Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --FH: 'Nunito', system-ui, sans-serif;
 }
+
 * { margin:0; padding:0; box-sizing:border-box; }
+
+html { min-height: 100%; }
+
 body {
-  background: var(--bg);
-  color: var(--text);
-  font-family: var(--FM);
   min-height: 100svh;
+  background:
+    radial-gradient(circle at 12% 10%, rgba(255, 79, 184, 0.20), transparent 30%),
+    radial-gradient(circle at 86% 12%, rgba(0, 184, 217, 0.18), transparent 32%),
+    radial-gradient(circle at 50% 96%, rgba(113, 55, 216, 0.16), transparent 36%),
+    linear-gradient(135deg, var(--bg), var(--bg-2));
+  color: var(--text);
+  font-family: var(--FF);
   display: flex;
   align-items: center;
   justify-content: center;
-  overflow: hidden;
+  overflow-x: hidden;
+  padding: 18px;
 }
 
-/* ── Background ── */
-.bg-grid {
-  position: fixed; inset: 0;
-  background-image:
-    linear-gradient(rgba(26,26,58,0.55) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(26,26,58,0.55) 1px, transparent 1px);
-  background-size: 44px 44px;
-  animation: g-drift 28s linear infinite;
-  pointer-events: none;
-}
-@keyframes g-drift {
-  0%   { background-position: 0 0; }
-  100% { background-position: 44px 44px; }
-}
-.bg-glow {
+body::before {
+  content: '';
   position: fixed;
-  width: 640px; height: 640px;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(0,232,255,0.05) 0%, transparent 65%);
-  top:50%; left:50%; transform:translate(-50%,-50%);
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(113, 55, 216, 0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(113, 55, 216, 0.06) 1px, transparent 1px);
+  background-size: 42px 42px;
+  mask-image: radial-gradient(circle at center, black, transparent 78%);
   pointer-events: none;
+  animation: gridDrift 34s linear infinite;
+}
+
+@keyframes gridDrift {
+  0%   { background-position: 0 0; }
+  100% { background-position: 42px 42px; }
+}
+
+.bg-glow,
+.bg-grid { display: none; }
+
+.brand-logo {
+  width: 104px;
+  height: auto;
+  max-height: 86px;
+  object-fit: contain;
+  display: block;
+  filter: drop-shadow(0 12px 20px rgba(81, 44, 130, 0.16));
+}
+
+.logo-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 14px;
+  border-radius: 24px;
+  background: rgba(255,255,255,0.78);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-soft);
+  backdrop-filter: blur(14px);
 }
 
 /* ── Overlays ── */
 .overlay {
-  position: fixed; inset: 0; z-index: 200;
-  display: flex; flex-direction: column;
-  align-items: center; justify-content: center;
-  gap: 18px; padding: 32px; text-align: center;
-  background: rgba(7,7,20,0.96);
-  backdrop-filter: blur(10px);
-  animation: ov-in 0.35s ease both;
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  padding: 30px 20px;
+  text-align: center;
+  background:
+    radial-gradient(circle at 30% 20%, rgba(255, 79, 184, 0.16), transparent 34%),
+    radial-gradient(circle at 80% 80%, rgba(0, 184, 217, 0.14), transparent 35%),
+    rgba(255, 248, 255, 0.92);
+  backdrop-filter: blur(18px);
+  animation: ovIn 0.35s ease both;
 }
 .overlay.hidden { display: none; }
-@keyframes ov-in {
-  from { opacity:0; transform:scale(0.96); }
+@keyframes ovIn {
+  from { opacity:0; transform:scale(0.97); }
   to   { opacity:1; transform:scale(1); }
 }
 .ov-eye {
-  font-size: 10px; letter-spacing: 0.3em;
-  text-transform: uppercase; color: var(--muted);
+  padding: 7px 12px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--purple);
+  background: rgba(113, 55, 216, 0.10);
+  border: 1px solid rgba(113, 55, 216, 0.16);
 }
 .ov-title {
-  font-family: var(--FD);
-  font-size: clamp(54px, 15vw, 76px);
-  line-height: 0.9; letter-spacing: 0.05em;
+  font-family: var(--FH);
+  font-size: clamp(54px, 15vw, 88px);
+  line-height: 0.86;
+  letter-spacing: -0.045em;
+  font-weight: 900;
 }
-.ov-title.cyan { color:var(--cyan); text-shadow:0 0 60px rgba(0,232,255,0.45); }
-.ov-title.red  { color:var(--red);  text-shadow:0 0 60px rgba(255,58,104,0.45); }
-.ov-title.amb  { color:var(--amber);text-shadow:0 0 60px rgba(255,190,0,0.45); }
+.ov-title.cyan,
+.ov-title.amb {
+  color: transparent;
+  background: linear-gradient(135deg, var(--purple), var(--pink), var(--cyan));
+  -webkit-background-clip: text;
+  background-clip: text;
+  text-shadow: none;
+}
+.ov-title.red  {
+  color: transparent;
+  background: linear-gradient(135deg, var(--red), var(--pink), var(--purple));
+  -webkit-background-clip: text;
+  background-clip: text;
+}
 .ov-body {
-  font-size: 12.5px; color: var(--muted);
-  line-height: 1.85; max-width: 280px; letter-spacing: 0.03em;
+  font-size: 14.5px;
+  color: var(--muted);
+  line-height: 1.72;
+  max-width: 360px;
+  font-weight: 600;
 }
 .ov-stat {
-  font-family: var(--FD); font-size: 34px; color: var(--amber);
+  font-family: var(--FH);
+  font-size: 40px;
+  color: var(--purple);
+  font-weight: 900;
+}
+.intro-steps {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  width: min(420px, 100%);
+  margin: 4px 0 2px;
+}
+.step-card {
+  background: rgba(255,255,255,0.78);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  padding: 12px 10px;
+  box-shadow: 0 12px 30px rgba(81, 44, 130, 0.10);
+}
+.step-card b {
+  display: block;
+  font-family: var(--FH);
+  color: var(--purple);
+  font-size: 21px;
+  margin-bottom: 2px;
+}
+.step-card span {
+  display: block;
+  font-size: 11px;
+  font-weight: 800;
+  color: var(--muted);
 }
 
 /* ── Buttons ── */
 .btn {
-  font-family: var(--FM); font-size: 11.5px;
-  letter-spacing: 0.12em; text-transform: uppercase;
-  border-radius: 9px; padding: 11px 28px; cursor: pointer;
-  transition: all 0.14s; background: transparent;
-  color: var(--text); border: 1px solid var(--border);
+  font-family: var(--FF);
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  border-radius: 999px;
+  padding: 13px 24px;
+  cursor: pointer;
+  transition: transform 0.16s ease, box-shadow 0.16s ease, border-color 0.16s ease, background 0.16s ease;
+  background: rgba(255,255,255,0.78);
+  color: var(--purple);
+  border: 1px solid var(--border-strong);
+  box-shadow: 0 8px 22px rgba(81, 44, 130, 0.08);
 }
 .btn:hover {
-  border-color: var(--cyan); color: var(--cyan);
-  box-shadow: 0 0 22px var(--cyan-glow), inset 0 0 16px var(--cyan-glow);
+  transform: translateY(-1px);
+  border-color: rgba(113, 55, 216, 0.42);
+  box-shadow: 0 14px 34px rgba(81, 44, 130, 0.16);
 }
-.btn:active { transform: scale(0.97); }
+.btn:active { transform: scale(0.98); }
 .btn-p {
-  background: var(--cyan-glow); border-color: var(--cyan);
-  color: var(--cyan); box-shadow: 0 0 24px var(--cyan-glow);
+  color: #fff;
+  border: 0;
+  background: linear-gradient(135deg, var(--purple), var(--pink));
+  box-shadow: 0 16px 36px rgba(255, 79, 184, 0.26);
 }
 .btn-p:hover {
-  background: rgba(0,232,255,0.18);
-  box-shadow: 0 0 34px rgba(0,232,255,0.2);
+  box-shadow: 0 18px 44px rgba(113, 55, 216, 0.28);
 }
-.btn:disabled { opacity: 0.22; pointer-events: none; }
+.btn:disabled { opacity: 0.42; pointer-events: none; }
 
 /* ── Game container ── */
 .game {
-  position: relative; z-index: 10;
-  width: 100%; max-width: 450px;
-  padding: 18px 16px;
-  display: flex; flex-direction: column; gap: 14px;
+  position: relative;
+  z-index: 10;
+  width: min(100%, 520px);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 18px;
+  border-radius: 34px;
+  background: rgba(255,255,255,0.64);
+  border: 1px solid rgba(255,255,255,0.65);
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(18px);
 }
 .game.hidden { display: none; }
 
 /* Header */
 .hdr {
-  display: flex; justify-content: space-between; align-items: center;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 10px 8px;
+}
+.hdr-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+.hdr-logo {
+  width: 50px;
+  height: 50px;
+  object-fit: contain;
+  padding: 6px;
+  border-radius: 16px;
+  background: rgba(255,255,255,0.78);
+  border: 1px solid var(--border);
+  box-shadow: 0 8px 20px rgba(81, 44, 130, 0.10);
 }
 .hdr-title {
-  font-family: var(--FD); font-size: 22px; color: var(--cyan);
-  letter-spacing: 0.12em; text-shadow: 0 0 14px rgba(0,232,255,0.35);
+  font-family: var(--FH);
+  font-size: 22px;
+  color: var(--purple);
+  letter-spacing: -0.03em;
+  font-weight: 900;
+  white-space: nowrap;
+}
+.hdr-subtitle {
+  font-size: 10px;
+  color: var(--muted);
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  margin-top: -2px;
 }
 .hdr-right {
-  display: flex; align-items: center; gap: 14px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
 }
-.lives { display: flex; gap: 6px; align-items: center; }
+.lives {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  padding: 9px 10px;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.72);
+  border: 1px solid var(--border);
+}
 .ld {
-  width: 8px; height: 8px; border-radius: 50%;
-  background: var(--red); box-shadow: 0 0 6px var(--red);
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--red);
+  box-shadow: 0 0 0 4px rgba(240, 68, 111, 0.12);
   transition: all 0.3s;
 }
-.ld.gone { background: var(--border); box-shadow: none; }
-.lvl-b { text-align: right; }
+.ld.gone {
+  background: #d9d2e8;
+  box-shadow: none;
+}
+.lvl-b {
+  min-width: 64px;
+  padding: 9px 12px;
+  border-radius: 18px;
+  text-align: center;
+  background: linear-gradient(135deg, rgba(255,183,3,0.18), rgba(255,255,255,0.72));
+  border: 1px solid rgba(255, 183, 3, 0.30);
+}
 .lvl-n {
-  font-family: var(--FD); font-size: 26px; color: var(--amber);
-  line-height: 1; text-shadow: 0 0 10px rgba(255,190,0,0.35);
+  font-family: var(--FH);
+  font-size: 28px;
+  color: var(--purple);
+  line-height: 0.9;
+  font-weight: 900;
 }
 .lvl-l {
-  font-size: 8.5px; letter-spacing: 0.2em;
-  text-transform: uppercase; color: var(--muted);
+  font-size: 8.5px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--muted);
+  font-weight: 900;
+  margin-top: 3px;
 }
 
 /* Score strip */
 .score-strip {
-  display: flex; justify-content: space-between; align-items: center;
-  background: var(--surface); border: 1px solid var(--border);
-  border-radius: 10px; padding: 9px 16px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
 }
-.ss-v { font-family: var(--FD); font-size: 26px; color: var(--text); }
+.score-item {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 22px;
+  padding: 12px 15px;
+  box-shadow: 0 12px 28px rgba(81, 44, 130, 0.08);
+}
+.score-item:last-child { text-align:right; }
+.ss-v {
+  font-family: var(--FH);
+  font-size: 31px;
+  color: var(--text);
+  font-weight: 900;
+  line-height: 1;
+}
 .ss-l {
-  font-size: 8.5px; letter-spacing: 0.2em;
-  text-transform: uppercase; color: var(--muted);
-  margin-bottom: 1px;
+  font-size: 9.5px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 5px;
+  font-weight: 900;
 }
 
 /* Sequence chips */
 .sequence {
-  display: flex; gap: 9px;
-  justify-content: center; flex-wrap: wrap;
-  min-height: 50px; align-items: center;
+  display: flex;
+  gap: 9px;
+  justify-content: center;
+  flex-wrap: wrap;
+  min-height: 58px;
+  align-items: center;
+  padding: 4px 0;
 }
 .chip {
-  width: 50px; height: 50px; border-radius: 11px;
+  min-width: 54px;
+  height: 54px;
+  border-radius: 18px;
   border: 1px solid var(--border);
-  display: flex; flex-direction: column;
-  align-items: center; justify-content: center;
-  font-size: 13px; font-weight: 500; color: var(--muted);
-  background: var(--surface);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 900;
+  color: var(--muted);
+  background: rgba(255,255,255,0.76);
+  box-shadow: 0 8px 18px rgba(81, 44, 130, 0.07);
   transition: all 0.28s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 .chip small {
-  font-size: 7.5px; letter-spacing: 0.08em;
-  text-transform: uppercase; opacity: 0.45; margin-top: 2px;
+  font-size: 7px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  opacity: 0.58;
+  margin-top: 2px;
 }
 .chip.active {
-  border-color: var(--cyan); color: var(--cyan);
-  background: var(--cyan-glow);
-  box-shadow: 0 0 0 3px rgba(0,232,255,0.08), 0 0 18px rgba(0,232,255,0.1);
-  transform: translateY(-3px) scale(1.07);
+  border-color: rgba(113, 55, 216, 0.36);
+  color: var(--purple);
+  background: linear-gradient(135deg, rgba(113, 55, 216, 0.14), rgba(255,255,255,0.86));
+  box-shadow: 0 12px 28px rgba(113, 55, 216, 0.16);
+  transform: translateY(-3px) scale(1.05);
 }
 .chip.done {
-  border-color: var(--green); color: var(--green);
-  background: rgba(0,240,160,0.07);
+  border-color: rgba(20, 184, 106, 0.32);
+  color: var(--green);
+  background: var(--green-soft);
 }
 .chip.playing {
-  border-color: var(--amber); color: var(--amber);
-  background: var(--amber-glow);
-  animation: chip-pop 0.38s ease;
+  border-color: rgba(255, 183, 3, 0.46);
+  color: #a66d00;
+  background: var(--amber-soft);
+  animation: chipPop 0.38s ease;
 }
-@keyframes chip-pop {
+@keyframes chipPop {
   0%  { transform: scale(1); }
-  45% { transform: scale(1.16) translateY(-4px); }
+  45% { transform: scale(1.14) translateY(-4px); }
   100%{ transform: scale(1); }
 }
 
 /* Note card */
 .note-card {
-  background: var(--surface); border: 1px solid var(--border);
-  border-radius: 16px; padding: 22px 18px;
-  text-align: center; position: relative; overflow: hidden;
-  transition: border-color 0.25s, box-shadow 0.25s;
+  background:
+    radial-gradient(circle at 18% 18%, rgba(255, 79, 184, 0.14), transparent 32%),
+    radial-gradient(circle at 85% 28%, rgba(0, 184, 217, 0.12), transparent 34%),
+    rgba(255,255,255,0.86);
+  border: 1px solid var(--border);
+  border-radius: 30px;
+  padding: 24px 18px 25px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  box-shadow: var(--shadow-soft);
+  transition: border-color 0.25s, box-shadow 0.25s, transform 0.25s;
+}
+.note-card::before {
+  content: '♪';
+  position: absolute;
+  left: 18px;
+  top: 12px;
+  color: rgba(113, 55, 216, 0.12);
+  font-size: 54px;
+  font-family: var(--FH);
+  font-weight: 900;
+  transform: rotate(-14deg);
 }
 .note-card::after {
   content: '';
-  position: absolute; top:0; left:0; right:0; height:1px;
-  background: linear-gradient(90deg, transparent, var(--cyan), transparent);
-  opacity: 0.35;
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background: linear-gradient(135deg, rgba(255,255,255,0.55), transparent 36%);
 }
-.note-card.on  { border-color: var(--green); box-shadow: 0 0 28px rgba(0,240,160,0.09); }
-.note-card.close{ border-color: var(--amber); }
-.note-card.off { border-color: var(--red); }
-
+.note-card.on  {
+  border-color: rgba(20, 184, 106, 0.42);
+  box-shadow: 0 18px 44px rgba(20, 184, 106, 0.16);
+  transform: translateY(-1px);
+}
+.note-card.close{
+  border-color: rgba(255, 183, 3, 0.48);
+  box-shadow: 0 18px 44px rgba(255, 183, 3, 0.16);
+}
+.note-card.off {
+  border-color: rgba(240, 68, 111, 0.42);
+  box-shadow: 0 18px 44px rgba(240, 68, 111, 0.14);
+}
 .nc-lbl {
-  font-size: 9.5px; letter-spacing: 0.25em;
-  text-transform: uppercase; color: var(--muted); margin-bottom: 5px;
+  position: relative;
+  z-index: 1;
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 5px;
+  font-weight: 900;
 }
 .nc-big {
-  font-family: var(--FD);
-  font-size: clamp(68px, 20vw, 92px);
-  line-height: 0.88; letter-spacing: 0.04em;
-  color: var(--cyan); text-shadow: 0 0 38px rgba(0,232,255,0.38);
+  position: relative;
+  z-index: 1;
+  font-family: var(--FH);
+  font-size: clamp(76px, 20vw, 106px);
+  line-height: 0.9;
+  letter-spacing: -0.055em;
+  color: transparent;
+  background: linear-gradient(135deg, var(--purple), var(--pink));
+  -webkit-background-clip: text;
+  background-clip: text;
+  font-weight: 900;
   transition: all 0.18s;
 }
-.nc-big.on   { color: var(--green); text-shadow: 0 0 38px rgba(0,240,160,0.45); }
-.nc-big.fail { color: var(--red);   text-shadow: 0 0 28px rgba(255,58,104,0.4); }
+.nc-big.on {
+  background: linear-gradient(135deg, var(--green), var(--cyan));
+  -webkit-background-clip: text;
+  background-clip: text;
+}
+.nc-big.fail {
+  background: linear-gradient(135deg, var(--red), var(--pink));
+  -webkit-background-clip: text;
+  background-clip: text;
+}
 .nc-hz {
-  font-size: 11px; color: var(--muted);
-  margin-top: 5px; font-style: italic; font-weight: 300;
+  position: relative;
+  z-index: 1;
+  font-size: 12px;
+  color: var(--muted);
+  margin-top: 8px;
+  font-weight: 800;
 }
 
 /* Pitch meter */
-.meter-wrap { display: flex; flex-direction: column; gap: 7px; }
+.meter-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 14px;
+  border-radius: 24px;
+  background: rgba(255,255,255,0.64);
+  border: 1px solid var(--border);
+}
 .m-lbl-row {
-  display: flex; justify-content: space-between;
-  font-size: 8.5px; letter-spacing: 0.1em;
-  text-transform: uppercase; color: var(--muted);
+  display: flex;
+  justify-content: space-between;
+  font-size: 9px;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--muted);
+  font-weight: 900;
 }
 .m-bar {
-  position: relative; height: 13px; border-radius: 7px;
-  overflow: hidden; background: var(--surface);
+  position: relative;
+  height: 16px;
+  border-radius: 999px;
+  overflow: visible;
+  background: var(--surface-solid);
   border: 1px solid var(--border);
 }
 .m-zones {
-  position: absolute; inset: 0;
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  border-radius: inherit;
   background: linear-gradient(90deg,
-    rgba(255,58,104,0.22) 0%,
-    rgba(255,190,0,0.18)  22%,
-    rgba(0,240,160,0.28)  40%,
-    rgba(0,240,160,0.28)  60%,
-    rgba(255,190,0,0.18)  78%,
-    rgba(255,58,104,0.22) 100%
+    rgba(240, 68, 111, 0.28) 0%,
+    rgba(255,183,3,0.25)  22%,
+    rgba(20,184,106,0.30)  40%,
+    rgba(20,184,106,0.30)  60%,
+    rgba(255,183,3,0.25)  78%,
+    rgba(240, 68, 111, 0.28) 100%
   );
 }
 .m-tick {
-  position: absolute; top:0; bottom:0; left:50%;
-  width: 2px; margin-left:-1px;
-  background: rgba(0,232,255,0.45);
+  position: absolute;
+  top:-3px;
+  bottom:-3px;
+  left:50%;
+  width: 3px;
+  margin-left:-1.5px;
+  border-radius: 999px;
+  background: rgba(113, 55, 216, 0.48);
 }
 .m-dot {
-  position: absolute; top:50%; left:50%;
-  width: 19px; height: 19px;
-  margin-top: -9px; margin-left: -9px;
-  border-radius: 50%; background: var(--muted);
-  border: 2px solid var(--bg);
-  box-shadow: 0 2px 8px rgba(0,0,0,0.6);
+  position: absolute;
+  top:50%;
+  left:50%;
+  width: 23px;
+  height: 23px;
+  margin-top: -11.5px;
+  margin-left: -11.5px;
+  border-radius: 50%;
+  background: #a89fc0;
+  border: 3px solid #fff;
+  box-shadow: 0 8px 18px rgba(81, 44, 130, 0.20);
   transition: left 0.07s linear, background 0.14s, box-shadow 0.14s;
 }
-.m-dot.on    { background:var(--green); box-shadow:0 0 12px var(--green), 0 2px 8px rgba(0,0,0,0.5); }
-.m-dot.close { background:var(--amber); box-shadow:0 0 8px var(--amber), 0 2px 8px rgba(0,0,0,0.5); }
+.m-dot.on {
+  background:var(--green);
+  box-shadow:0 0 0 6px rgba(20,184,106,0.13), 0 8px 18px rgba(81, 44, 130, 0.18);
+}
+.m-dot.close {
+  background:var(--amber);
+  box-shadow:0 0 0 6px rgba(255,183,3,0.14), 0 8px 18px rgba(81, 44, 130, 0.18);
+}
 .m-info {
-  display: flex; justify-content: space-between; align-items: center;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
 }
 .det-lbl {
-  font-size: 8.5px; letter-spacing: 0.15em;
-  text-transform: uppercase; color: var(--muted);
+  font-size: 9px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
+  font-weight: 900;
 }
 .det-val {
-  font-family: var(--FD); font-size: 21px;
-  color: var(--text); letter-spacing: 0.08em;
+  font-family: var(--FH);
+  font-size: 24px;
+  color: var(--text);
+  letter-spacing: -0.02em;
+  font-weight: 900;
 }
 .cents-v {
-  font-size: 10px; color: var(--muted);
-  font-style: italic; min-width: 46px; text-align: right;
+  font-size: 12px;
+  color: var(--muted);
+  font-weight: 900;
+  min-width: 54px;
+  text-align: right;
 }
 
 /* Bars */
-.bars-row { display: flex; flex-direction: column; gap: 9px; }
-.bar-it { display: flex; flex-direction: column; gap: 4px; }
+.bars-row {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.bar-it {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 12px 14px;
+  border-radius: 20px;
+  background: rgba(255,255,255,0.62);
+  border: 1px solid var(--border);
+}
 .bar-lr {
-  display: flex; justify-content: space-between;
-  font-size: 8.5px; letter-spacing: 0.14em;
-  text-transform: uppercase; color: var(--muted);
+  display: flex;
+  justify-content: space-between;
+  font-size: 9.5px;
+  letter-spacing: 0.10em;
+  text-transform: uppercase;
+  color: var(--muted);
+  font-weight: 900;
 }
 .bar-trk {
-  height: 5px; background: var(--surface);
-  border: 1px solid var(--border); border-radius: 3px; overflow: hidden;
+  height: 8px;
+  background: rgba(113, 55, 216, 0.08);
+  border-radius: 999px;
+  overflow: hidden;
 }
-.bar-f { height: 100%; border-radius: 3px; width: 0%; transition: width 0.05s linear; }
+.bar-f {
+  height: 100%;
+  border-radius: 999px;
+  width: 0%;
+  transition: width 0.05s linear;
+}
 .hf {
-  background: linear-gradient(90deg, var(--cyan), var(--green));
-  box-shadow: 0 0 6px rgba(0,232,255,0.4);
+  background: linear-gradient(90deg, var(--purple), var(--green));
+  box-shadow: 0 0 14px rgba(20,184,106,0.28);
   transition: width 0.05s linear, background 0.3s;
 }
 .hf.done { background: linear-gradient(90deg, var(--amber), var(--green)); }
 .tf {
-  background: var(--cyan);
+  background: linear-gradient(90deg, var(--cyan), var(--purple));
   transition: width 0.1s linear, background 0.25s;
 }
 .tf.warn { background: var(--amber); }
@@ -322,12 +663,16 @@ body {
 
 /* Status */
 .status {
-  text-align: center; font-size: 11.5px;
-  letter-spacing: 0.07em; color: var(--muted);
-  min-height: 18px; transition: color 0.2s;
+  text-align: center;
+  font-size: 13px;
+  letter-spacing: 0.01em;
+  color: var(--muted);
+  min-height: 21px;
+  transition: color 0.2s;
+  font-weight: 900;
 }
 .status.good { color: var(--green); }
-.status.warn { color: var(--amber); }
+.status.warn { color: #b57700; }
 .status.bad  { color: var(--red); }
 
 /* Actions */
@@ -336,13 +681,35 @@ body {
 
 /* Flash */
 .flash {
-  position: fixed; inset: 0; pointer-events: none; z-index: 100;
-  animation: flash-out 0.65s ease forwards;
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 100;
+  animation: flashOut 0.65s ease forwards;
 }
-@keyframes flash-out {
+@keyframes flashOut {
   0%  { opacity: 0; }
   18% { opacity: 1; }
   100%{ opacity: 0; }
+}
+
+@media (max-width: 520px) {
+  body { align-items: flex-start; padding: 12px; }
+  .game { padding: 12px; border-radius: 28px; gap: 12px; }
+  .hdr { align-items: flex-start; padding: 6px; }
+  .hdr-logo { width: 44px; height: 44px; }
+  .hdr-title { font-size: 18px; }
+  .hdr-subtitle { font-size: 8.5px; }
+  .hdr-right { gap: 7px; }
+  .lives { padding: 8px; gap: 5px; }
+  .lvl-b { min-width: 54px; padding: 8px 9px; }
+  .lvl-n { font-size: 24px; }
+  .intro-steps { grid-template-columns: 1fr; max-width: 280px; }
+  .score-strip { gap: 8px; }
+  .score-item { padding: 11px 12px; border-radius: 18px; }
+  .ss-v { font-size: 27px; }
+  .note-card { padding: 22px 14px; border-radius: 26px; }
+  .nc-big { font-size: clamp(74px, 25vw, 96px); }
 }
 </style>
 </head>
@@ -353,20 +720,30 @@ body {
 
 <!-- Intro -->
 <div class="overlay" id="oIntro">
-  <div class="ov-eye">Entrenamiento vocal</div>
+  <div class="logo-pill">
+    <img class="brand-logo" src="./logo.png" alt="Logo Musicala" onerror="this.closest('.logo-pill').style.display='none'">
+  </div>
+  <div class="ov-eye">Entrenamiento vocal · Musicala</div>
   <div class="ov-title cyan">NOTA<br>PERFECTA</div>
   <div class="ov-body">
-    Escucha la nota y cántala con tu voz.<br>
-    Mantén el tono para avanzar de nivel.<br>
+    Escucha la nota, cántala con tu voz y sostén el tono para avanzar.<br>
     Escala Do mayor · Do Re Mi Fa Sol La Si
+  </div>
+  <div class="intro-steps" aria-label="Cómo jugar">
+    <div class="step-card"><b>1</b><span>Escucha</span></div>
+    <div class="step-card"><b>2</b><span>Canta</span></div>
+    <div class="step-card"><b>3</b><span>Sostén</span></div>
   </div>
   <button class="btn btn-p" id="btnStart">▶ &nbsp;Comenzar</button>
 </div>
 
 <!-- Game Over -->
 <div class="overlay hidden" id="oGameOver">
+  <div class="logo-pill">
+    <img class="brand-logo" src="./logo.png" alt="Logo Musicala" onerror="this.closest('.logo-pill').style.display='none'">
+  </div>
   <div class="ov-eye">Fin del juego</div>
-  <div class="ov-title red">GAME<br>OVER</div>
+  <div class="ov-title red">OTRA<br>RONDA</div>
   <div class="ov-stat" id="goScore">0 pts</div>
   <div class="ov-body" id="goBody">Nivel 1 · 0 notas acertadas</div>
   <button class="btn btn-p" id="btnRestart">↺ &nbsp;Reintentar</button>
@@ -374,6 +751,9 @@ body {
 
 <!-- Level Up (brief) -->
 <div class="overlay hidden" id="oLvlUp">
+  <div class="logo-pill">
+    <img class="brand-logo" src="./logo.png" alt="Logo Musicala" onerror="this.closest('.logo-pill').style.display='none'">
+  </div>
   <div class="ov-eye">¡Nivel superado!</div>
   <div class="ov-title amb">NIVEL<br><span id="luNum">2</span></div>
   <div class="ov-body" id="luMsg">¡Excelente afinación!</div>
@@ -383,9 +763,15 @@ body {
 <div class="game hidden" id="gameUI">
 
   <div class="hdr">
-    <div class="hdr-title">NOTA PERFECTA</div>
+    <div class="hdr-brand">
+      <img class="hdr-logo" src="./logo.png" alt="Logo Musicala" onerror="this.style.display='none'">
+      <div>
+        <div class="hdr-title">Nota Perfecta</div>
+        <div class="hdr-subtitle">Musicala · Afinación vocal</div>
+      </div>
+    </div>
     <div class="hdr-right">
-      <div class="lives">
+      <div class="lives" aria-label="Vidas restantes">
         <div class="ld" id="ld0"></div>
         <div class="ld" id="ld1"></div>
         <div class="ld" id="ld2"></div>
@@ -398,11 +784,11 @@ body {
   </div>
 
   <div class="score-strip">
-    <div>
+    <div class="score-item">
       <div class="ss-l">Puntos</div>
       <div class="ss-v" id="scoreV">0</div>
     </div>
-    <div style="text-align:right">
+    <div class="score-item">
       <div class="ss-l">Notas acertadas</div>
       <div class="ss-v" id="hitsV">0</div>
     </div>
@@ -455,7 +841,7 @@ body {
   <div class="status" id="statusEl">—</div>
 
   <div class="actions">
-    <button class="btn" id="btnReplay">↻ &nbsp;Escuchar</button>
+    <button class="btn" id="btnReplay">↻ &nbsp;Escuchar de nuevo</button>
   </div>
 
 </div>
@@ -515,14 +901,17 @@ function playTone(freq, dur=1.0, vol=0.42) {
   ensureAudio();
   const o = audioCtx.createOscillator();
   const g = audioCtx.createGain();
-  o.type = 'sine'; o.frequency.value = freq;
+  o.type = 'sine';
+  o.frequency.value = freq;
   const t = audioCtx.currentTime;
   g.gain.setValueAtTime(0, t);
   g.gain.linearRampToValueAtTime(vol, t+0.04);
   g.gain.setValueAtTime(vol, t+dur-0.1);
   g.gain.linearRampToValueAtTime(0, t+dur);
-  o.connect(g); g.connect(audioCtx.destination);
-  o.start(t); o.stop(t+dur);
+  o.connect(g);
+  g.connect(audioCtx.destination);
+  o.start(t);
+  o.stop(t+dur);
 }
 
 function playOK() {
@@ -530,12 +919,15 @@ function playOK() {
   const t = audioCtx.currentTime;
   [523.25,659.25,784.00].forEach((f,i) => {
     const o = audioCtx.createOscillator(), g = audioCtx.createGain();
-    o.type = 'sine'; o.frequency.value = f;
+    o.type = 'sine';
+    o.frequency.value = f;
     g.gain.setValueAtTime(0, t+i*0.1);
     g.gain.linearRampToValueAtTime(0.18, t+i*0.1+0.03);
     g.gain.linearRampToValueAtTime(0, t+i*0.1+0.3);
-    o.connect(g); g.connect(audioCtx.destination);
-    o.start(t+i*0.1); o.stop(t+i*0.1+0.35);
+    o.connect(g);
+    g.connect(audioCtx.destination);
+    o.start(t+i*0.1);
+    o.stop(t+i*0.1+0.35);
   });
 }
 
@@ -543,12 +935,15 @@ function playFail() {
   ensureAudio();
   const t = audioCtx.currentTime;
   const o = audioCtx.createOscillator(), g = audioCtx.createGain();
-  o.type = 'sawtooth'; o.frequency.value = 160;
+  o.type = 'sawtooth';
+  o.frequency.value = 160;
   g.gain.setValueAtTime(0, t);
   g.gain.linearRampToValueAtTime(0.25, t+0.02);
   g.gain.linearRampToValueAtTime(0, t+0.38);
-  o.connect(g); g.connect(audioCtx.destination);
-  o.start(t); o.stop(t+0.4);
+  o.connect(g);
+  g.connect(audioCtx.destination);
+  o.start(t);
+  o.stop(t+0.4);
 }
 
 const wait = ms => new Promise(r => setTimeout(r, ms));
@@ -567,8 +962,14 @@ async function playSeqDemo(seq, hilite) {
 // ═══════════════════════════════════════════════
 async function startMic() {
   if (micStream) return;
+
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+    setSt('⚠ Este navegador no permite usar el micrófono aquí', 'bad');
+    return;
+  }
+
   try {
-    const stream = await navigator.mediaDevices.getUserMedia({audio:true,video:false});
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
     micStream = stream;
     ensureAudio();
     const src = audioCtx.createMediaStreamSource(stream);
@@ -646,7 +1047,8 @@ function startPitchLoop() {
     frameN++;
 
     if (gPhase !== 'listening') {
-      dotReset(); return;
+      dotReset();
+      return;
     }
 
     // Timer: every frame
@@ -660,9 +1062,10 @@ function startPitchLoop() {
 
     if (freq <= 0) {
       gHoldStart = null;
-      setHold(0); dotReset();
+      setHold(0);
+      dotReset();
       setDet('—', null);
-      setSt('Canta más fuerte...','');
+      setSt('Canta un poquito más fuerte...', '');
       return;
     }
 
@@ -681,14 +1084,14 @@ function startPitchLoop() {
       if (elapsed >= HOLD_MS) {
         onNoteHeld();
       } else {
-        setSt('¡Sostenla! 🎵','good');
+        setSt('¡Sosténla! 🎵', 'good');
         cardState('on');
       }
     } else {
       gHoldStart = null;
       setHold(0);
       const dir = cents < 0 ? '↑ Sube la nota' : '↓ Baja la nota';
-      setSt(dir,'warn');
+      setSt(dir, 'warn');
       cardState(absC < 120 ? 'close' : 'off');
     }
   }
@@ -713,7 +1116,9 @@ const id = s => document.getElementById(s);
 
 function setSt(msg, cls='') {
   const el = id('statusEl');
-  el.textContent = msg; el.className = 'status ' + cls;
+  if (!el) return;
+  el.textContent = msg;
+  el.className = 'status ' + cls;
 }
 
 function setDet(name, cents) {
@@ -721,7 +1126,9 @@ function setDet(name, cents) {
   if (cents !== null && name !== '—') {
     const c = Math.round(cents);
     id('centsV').textContent = (c > 0 ? '+' : '') + c + '¢';
-  } else { id('centsV').textContent = ''; }
+  } else {
+    id('centsV').textContent = '';
+  }
 }
 
 function setHold(pct) {
@@ -732,7 +1139,10 @@ function setHold(pct) {
 }
 
 function dotReset() {
-  const d = id('mDot'); d.style.left='50%'; d.className='m-dot';
+  const d = id('mDot');
+  if (!d) return;
+  d.style.left='50%';
+  d.className='m-dot';
 }
 
 function updateDot(cents) {
@@ -754,7 +1164,8 @@ function updateLivesUI() {
 }
 
 function renderSeq(activeDemo=-1) {
-  const el = id('seqEl'); el.innerHTML = '';
+  const el = id('seqEl');
+  el.innerHTML = '';
   gSeq.forEach((ni, i) => {
     const c = document.createElement('div');
     let cls = 'chip';
@@ -787,11 +1198,15 @@ function genSeq(lvl) {
 }
 
 async function startLevel() {
-  gPhase = 'idle'; gIdx = 0; gMiss = 0;
-  gSeq = genSeq(gLvl); gTL = timeLimit(gLvl);
+  gPhase = 'idle';
+  gIdx = 0;
+  gMiss = 0;
+  gSeq = genSeq(gLvl);
+  gTL = timeLimit(gLvl);
 
   id('lvlN').textContent = gLvl;
   id('btnReplay').disabled = true;
+  id('btnReplay').textContent = '↻  Escuchar de nuevo';
 
   id('ncLbl').textContent = 'Escucha...';
   id('ncBig').textContent  = '♪';
@@ -802,8 +1217,9 @@ async function startLevel() {
   id('timerBar').style.width = '100%';
   id('timerBar').className   = 'bar-f tf';
   id('timerLbl').textContent = '—';
-  setDet('—', null); dotReset();
-  setSt('Escucha la secuencia...','');
+  setDet('—', null);
+  dotReset();
+  setSt('Escucha la secuencia...', '');
   renderSeq(-1);
 
   // Demo
@@ -821,7 +1237,7 @@ async function startLevel() {
   gPhase = 'listening';
   gHoldStart = null;
   gTimerStart = performance.now();
-  setSt('¡Tu turno! Canta la nota','');
+  setSt('¡Tu turno! Canta la nota', '');
   id('btnReplay').disabled = false;
 }
 
@@ -833,10 +1249,11 @@ async function onNoteHeld() {
   cardState('on');
   setHold(100);
 
-  gScore += 10 * gLvl; gHits++;
+  gScore += 10 * gLvl;
+  gHits++;
   id('scoreV').textContent = gScore;
   id('hitsV').textContent  = gHits;
-  setSt('¡Perfecta! ✓','good');
+  setSt('¡Perfecta! ✓', 'good');
 
   // Mark chip done visually
   const chips = document.querySelectorAll('.chip');
@@ -853,7 +1270,7 @@ async function onNoteHeld() {
     gHoldStart = null;
     gTimerStart = performance.now();
     setHold(0);
-    setSt('¡Siguiente! ' + NOTES[gSeq[gIdx]].name,'');
+    setSt('¡Siguiente! ' + NOTES[gSeq[gIdx]].name, '');
   }
 }
 
@@ -865,13 +1282,18 @@ async function onTimerExpired() {
   gMiss++;
 
   if (gMiss >= 3) {
-    gLives--; gMiss = 0;
+    gLives--;
+    gMiss = 0;
     updateLivesUI();
     setSt(`Vida perdida · ${gLives} restante${gLives!==1?'s':''}`, 'bad');
     await wait(1300);
-    if (gLives <= 0) { doGameOver(); return; }
+    if (gLives <= 0) {
+      doGameOver();
+      return;
+    }
     // Restart whole level
-    await startLevel(); return;
+    await startLevel();
+    return;
   }
 
   setSt(`Tiempo agotado · Intento ${gMiss}/3`, 'bad');
@@ -881,14 +1303,14 @@ async function onTimerExpired() {
   gHoldStart = null;
   gTimerStart = performance.now();
   setHold(0);
-  setSt('¡Inténtalo de nuevo!','warn');
+  setSt('¡Inténtalo de nuevo!', 'warn');
 }
 
 async function doLevelUp() {
   gLvl++;
   const flash = document.createElement('div');
   flash.className = 'flash';
-  flash.style.background = 'radial-gradient(circle, rgba(255,190,0,0.22), transparent 70%)';
+  flash.style.background = 'radial-gradient(circle, rgba(255,183,3,0.28), transparent 70%)';
   document.body.appendChild(flash);
   setTimeout(() => flash.remove(), 700);
 
@@ -901,9 +1323,16 @@ async function doLevelUp() {
 }
 
 function lvlMsg(lvl) {
-  const m = ['','','','','¡Buen trabajo! Ahora con notas mezcladas',
-    '¡Afinando el oído!','¡Excelente! Secuencias de 2 notas',
-    '¡Magistral!','¡Virtuoso!','¡Imparable!','¡Nota perfecta real!'];
+  const m = [
+    '', '', '', '',
+    '¡Buen trabajo! Ahora con notas mezcladas',
+    '¡Afinando el oído!',
+    '¡Excelente! Secuencias de 2 notas',
+    '¡Magistral!',
+    '¡Virtuoso!',
+    '¡Imparable!',
+    '¡Nota perfecta real!'
+  ];
   return m[Math.min(lvl, m.length-1)] || '¡Imbatible!';
 }
 
@@ -918,9 +1347,10 @@ function doGameOver() {
 async function replayNote() {
   if (gPhase !== 'listening') return;
   gPhase = 'demo';
-  setSt('Escucha de nuevo...','');
+  setSt('Escucha de nuevo...', '');
   id('btnReplay').disabled = true;
-  gHoldStart = null; gTimerStart = null;
+  gHoldStart = null;
+  gTimerStart = null;
   setHold(0);
 
   const sub = gSeq.slice(0, gIdx+1);
@@ -935,19 +1365,26 @@ async function replayNote() {
   gPhase = 'listening';
   gTimerStart = performance.now();
   id('btnReplay').disabled = false;
-  setSt('¡Ahora tú!','');
+  setSt('¡Ahora tú!', '');
 }
 
 // ═══════════════════════════════════════════════
 //  INIT
 // ═══════════════════════════════════════════════
 async function init() {
-  gLvl=1; gLives=3; gScore=0; gHits=0;
+  gLvl = 1;
+  gLives = 3;
+  gScore = 0;
+  gHits = 0;
+  gMiss = 0;
+  gPhase = 'idle';
+
   id('scoreV').textContent = '0';
   id('hitsV').textContent  = '0';
   id('oIntro').classList.add('hidden');
   id('oGameOver').classList.add('hidden');
   id('gameUI').classList.remove('hidden');
+  id('btnReplay').onclick = null;
   updateLivesUI();
 
   await startMic();
@@ -970,9 +1407,13 @@ async function init() {
 
 id('btnStart').addEventListener('click', init);
 id('btnRestart').addEventListener('click', () => {
-  id('oGameOver').classList.add('hidden'); init();
+  id('oGameOver').classList.add('hidden');
+  init();
 });
-id('btnReplay').addEventListener('click', replayNote);
+id('btnReplay').addEventListener('click', () => {
+  if (id('btnReplay').onclick) return;
+  replayNote();
+});
 </script>
 </body>
 </html>
